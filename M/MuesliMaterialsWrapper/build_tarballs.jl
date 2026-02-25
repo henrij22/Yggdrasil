@@ -8,12 +8,12 @@ uuid = Base.UUID("a83860b7-747b-57cf-bf1f-3e79990d037f")
 delete!(Pkg.Types.get_last_stdlibs(v"1.6.3"), uuid)
 
 name = "MuesliMaterialsWrapper"
-version = v"0.11.1"
+version = v"0.14.0"
 
 
 # Collection of sources required to complete build
 sources = [
-    GitSource("https://github.com/henrij22/libjlmuesli.git", "b079092c49bbb22ddf0292b72256750584e7161b")
+    GitSource("https://github.com/henrij22/libjlmuesli.git", "dcb15bea2ada5fbcd8aa71244e6c0d239bbeb31b")
 ]
 
 # needed for libjulia_platforms and julia_versions
@@ -35,13 +35,12 @@ cmake --install builddir
 # fi
 """
 
-julia_versions = [v"1.10", v"1.11"]
+julia_versions = [v"1.10", v"1.11", v"1.12", v"1.13"]
 julia_compat = join("~" .* string.(getfield.(julia_versions, :major)) .* "." .* string.(getfield.(julia_versions, :minor)), ", ")
 
 platforms = vcat(libjulia_platforms.(julia_versions)...)
-filter!(p -> !(libc(p) == "musl"), platforms)
 
-# This can be removed when libcxxwrap_julia_jll supports riscv
+# This can be removed when libcxxwrap_julia_jll supports riscv (does it?)
 filter!(p -> !(arch(p) == "riscv64"), platforms)
 platforms = expand_cxxstring_abis(platforms)
 
@@ -53,8 +52,8 @@ products = [
 # Dependencies that must be installed before this package can be built
 dependencies = [
     BuildDependency(PackageSpec(; name="libjulia_jll")),
-    Dependency("libcxxwrap_julia_jll"; compat="~0.13.3"),
-    Dependency(PackageSpec(name="MuesliMaterials_jll", uuid="ef259003-9f3a-5fc7-ae68-dce6b88dc7d6", url="https://github.com/henrij22/MuesliMaterials_jll.jl"); compat="1.16.3")
+    Dependency("libcxxwrap_julia_jll"; compat="~0.14.7"),
+    Dependency(PackageSpec(name="MuesliMaterials_jll", uuid="ef259003-9f3a-5fc7-ae68-dce6b88dc7d6"); compat="1.16")
 ]
 
 
