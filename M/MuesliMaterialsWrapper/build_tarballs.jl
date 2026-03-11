@@ -52,8 +52,8 @@ products = [
 # Dependencies that must be installed before this package can be built
 dependencies = [
     BuildDependency(PackageSpec(; name="libjulia_jll")),
-    Dependency("libcxxwrap_julia_jll"; compat="~0.14.7"),
-    Dependency(PackageSpec(name="MuesliMaterials_jll", uuid="ef259003-9f3a-5fc7-ae68-dce6b88dc7d6"); compat="1.16")
+    Dependency("libcxxwrap_julia_jll"; compat="~0.14.8"),
+    Dependency(PackageSpec(name="MuesliMaterials_jll", uuid="ef259003-9f3a-5fc7-ae68-dce6b88dc7d6"); compat="1.16.1")
 ]
 
 
