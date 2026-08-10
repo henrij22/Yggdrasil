@@ -13,7 +13,7 @@ version = v"0.1.11"
 
 # Collection of sources required to complete build
 sources = [
-    GitSource("https://github.com/henrij22/libjltinygismo", "6786b273d30842db88ae0b1cdd66bf510ee96e45")
+    GitSource("https://github.com/henrij22/libjltinygismo", "7a11c385ea4431f4f6bd6801ade31f90e0d7fe95")
 ]
 
 # needed for libjulia_platforms and julia_versions
@@ -33,11 +33,6 @@ cmake -B builddir \
 cmake --build builddir --parallel ${nprocs}
 cmake --install builddir
 
-
-# if [[ "${target}" == *-mingw* ]]; then
-# #cmake install only grabs the .dll.a and leaves the actual .dll behind, manually move it 
-# mv builddir/libjltinygismo.dll ${libdir}
-# fi
 """
 
 julia_versions = [v"1.11", v"1.12", v"1.13"]
@@ -57,7 +52,7 @@ products = [
 # Dependencies that must be installed before this package can be built
 dependencies = [
     BuildDependency(PackageSpec(; name="libjulia_jll")),
-    Dependency("libcxxwrap_julia_jll"; compat="~0.14.7"),
+    Dependency("libcxxwrap_julia_jll"; compat="0.14"),
     Dependency("gismo_jll"; compat="~25.7.0"),
 ]
 
