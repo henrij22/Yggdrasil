@@ -1,138 +1,180 @@
 using BinaryBuilder, Pkg
 
-name = "oneAPI_Support"
-version = v"0.7.0"
+const YGGDRASIL_DIR = "../.."
+include(joinpath(YGGDRASIL_DIR, "fancy_toys.jl"))
 
-non_reg_ARGS = filter(arg -> arg != "--register", ARGS)
+name = "oneAPI_Support"
+version = v"0.10.0"
 
 generic_sources = [
     GitSource("https://github.com/JuliaGPU/oneAPI.jl",
-              "fc225b0b0691ab3df0898ef29fe907a7728d52d0")
+              "6336e40f435374ed588fcfd8ac6c792a56bdce67")
 ]
-
+platforms = expand_cxxstring_abis([Platform("x86_64", "linux"; libc="glibc")])
 platform_sources = Dict(
     # these are the deps installed by Anaconda for dpcpp_linux-64 and mkl-devel-dpcpp
     # https://conda.anaconda.org/intel/linux-64
-    Platform("x86_64", "linux"; libc="glibc") => [
-        ArchiveSource(
-            "https://software.repos.intel.com/python/conda/linux-64/compiler_shared-2025.0.0-intel_1169.tar.bz2",
-            "d31c89f3ffcc5b45366f7465b5a3411a3a2c529ecf72eebcc4c3a244f713d3eb"
+    platform => [
+        FileSource(
+            "https://software.repos.intel.com/python/conda/linux-64/compiler_shared-2025.3.1-intel_760.conda",
+            "0663e2efa13b68ad94ce11c62bea1f6cdbee17e629a616b30e113ea2c9d88cda",
+            filename="compiler_shared",
         ),
-        ArchiveSource(
-            "https://software.repos.intel.com/python/conda/linux-64/dpcpp-cpp-rt-2025.0.0-intel_1169.tar.bz2",
-            "2e74407b49fbf865462be995806aad4411ed992e1bee8404d2c75616db9c4ac6"
+        FileSource(
+            "https://software.repos.intel.com/python/conda/linux-64/dpcpp-cpp-rt-2025.3.1-intel_760.conda",
+            "3629a524acc849270652a8ad985b819804bff2c22841c62c6ca2d73e4c62eb9f",
+            filename="dpcpp-cpp-rt",
         ),
-        ArchiveSource(
-            "https://software.repos.intel.com/python/conda/linux-64/dpcpp_impl_linux-64-2025.0.0-intel_1169.tar.bz2",
-            "926f17c28168db9cb110d9803fc6037c0ea0b2bd37074ff4b21a1543f9e37777"
+        FileSource(
+            "https://software.repos.intel.com/python/conda/linux-64/dpcpp_impl_linux-64-2025.3.1-intel_760.conda",
+            "c08e7e7383bc81dfdb63fe1cf3bdbf6614f565684b8782a8ee34aedb774c713d",
+            filename="dpcpp_impl_linux-64",
         ),
-        ArchiveSource(
-            "https://software.repos.intel.com/python/conda/linux-64/dpcpp_linux-64-2025.0.0-intel_1169.tar.bz2",
-            "fc652956fb8315ce23cb677678e788c519c817c1f82d1548a37bc8b90fab4994"
+        FileSource(
+            "https://software.repos.intel.com/python/conda/linux-64/dpcpp_linux-64-2025.3.1-intel_760.conda",
+            "fae95c611d3a2277dfd867690b475b92d2ff95b6fb005e96da194abe2a8642db",
+            filename="dpcpp_linux-64",
         ),
-        ArchiveSource(
-            "https://software.repos.intel.com/python/conda/linux-64/intel-cmplr-lib-rt-2025.0.0-intel_1169.tar.bz2",
-            "9a6a149681d2cc87e0e818140c13af04c82fbfc0760a451db70cbbf07c560bde"
+        FileSource(
+            "https://software.repos.intel.com/python/conda/linux-64/intel-cmplr-lib-rt-2025.3.1-intel_760.conda",
+            "f4bd30eefe93d28b69e7aef32d297415ae69c12754fc23daf45fe3abedf66b31",
+            filename="intel-cmplr-lib-rt",
         ),
-        ArchiveSource(
-            "https://software.repos.intel.com/python/conda/linux-64/intel-cmplr-lib-ur-2025.0.0-intel_1169.tar.bz2",
-            "95ec7e7014adfc2dda389008975e63a66338a235dbdef4a694989ed41ee5db75"
+        FileSource(
+            "https://software.repos.intel.com/python/conda/linux-64/intel-cmplr-lib-ur-2025.3.1-intel_760.conda",
+            "1ac71a2ae242fdb28592e38ac620ab12933cfd685b233435e8db30e77e144e3f",
+            filename="intel-cmplr-lib-ur",
         ),
-        ArchiveSource(
-            "https://software.repos.intel.com/python/conda/linux-64/intel-cmplr-lic-rt-2025.0.0-intel_1169.tar.bz2",
-            "865288f5b133f205692f88e38af5b1928f8e7ce0c99f9068be2a5d247c540067"
+        FileSource(
+            "https://software.repos.intel.com/python/conda/linux-64/intel-cmplr-lic-rt-2025.3.1-intel_760.conda",
+            "80590e319968c681dc7ad612a3c0161b99d160e90a1529765fc8b710f190c40b",
+            filename="intel-cmplr-lic-rt",
         ),
-        ArchiveSource(
-            "https://software.repos.intel.com/python/conda/linux-64/intel-opencl-rt-2025.0.0-intel_1169.tar.bz2",
-            "fe38bfd3fcc01068aced409d34d64ee44e39831d2c4f1fcbf93bd0dee63f48ad"
+        FileSource(
+            "https://software.repos.intel.com/python/conda/linux-64/intel-opencl-rt-2025.3.1-intel_760.conda",
+            "4c0db4dd8ac4bb3717930776ae140f5e6cc59ab7dbd92792be8aec4894da6e3a",
+            filename="intel-opencl-rt",
         ),
-        ArchiveSource(
-            "https://software.repos.intel.com/python/conda/linux-64/intel-openmp-2025.0.0-intel_1169.tar.bz2",
-            "bd2ef2fdac3e013bfdf71921e0c7d3e831b9f498d6303852539b2c447bd42790"
+        FileSource(
+            "https://software.repos.intel.com/python/conda/linux-64/intel-openmp-2025.3.1-intel_760.conda",
+            "be640123438f6741baff1b1bb511e9ff9987f36d35eb09f4cdd0d1eeb075e9f9",
+            filename="intel-openmp",
         ),
-        ArchiveSource(
-            "https://software.repos.intel.com/python/conda/linux-64/intel-sycl-rt-2025.0.0-intel_1169.tar.bz2",
-            "696aeb88832c8836d202bb4a434c5aa7ec145f92d62cc0a2d36fe10e77494a62"
-        ),
-
-
-        ArchiveSource(
-            "https://software.repos.intel.com/python/conda/linux-64/mkl-2025.0.0-intel_939.tar.bz2",
-            "08018b7b73b8f1ceb2286d0fbf443bcf22ffd5fdff2010265f3cedbd0c3075d6"
-        ),
-        ArchiveSource(
-            "https://software.repos.intel.com/python/conda/linux-64/mkl-devel-2025.0.0-intel_939.tar.bz2",
-            "89fc99f696ee10291b39bd60f6104966ba07f750e4291830d3ed142e651ef0c3"
-        ),
-        ArchiveSource(
-            "https://software.repos.intel.com/python/conda/linux-64/mkl-devel-dpcpp-2025.0.0-intel_939.tar.bz2",
-            "149c3d52dcc7db2d30329e686f721dc3addc017ba19034b7517c9d287f29f7d6"
-        ),
-        ArchiveSource(
-            "https://software.repos.intel.com/python/conda/linux-64/mkl-dpcpp-2025.0.0-intel_939.tar.bz2",
-            "dfa829d9de4e7fbefacad3849a95957c020dc628b4ba010107918d62db4516be"
-        ),
-        ArchiveSource(
-            "https://software.repos.intel.com/python/conda/linux-64/mkl-include-2025.0.0-intel_939.tar.bz2",
-            "e3c02344b0405d90c7b992493a081f1f763fa96493626a5da1fe7693040a486f"
+        FileSource(
+            "https://software.repos.intel.com/python/conda/linux-64/intel-sycl-rt-2025.3.1-intel_760.conda",
+            "925bf6455471aa9c978f4e7e5610f514a0c7d0b8fba1ee78eb0c8ceaa95bf71e",
+            filename="intel-sycl-rt",
         ),
 
-        ArchiveSource(
-            "https://software.repos.intel.com/python/conda/linux-64/onemkl-sycl-blas-2025.0.0-intel_939.tar.bz2",
-            "89c7455152074e75cb8891ae95445e033f28243ca8ce0e54d7ef2a0890cd03dc"
+        FileSource(
+            "https://software.repos.intel.com/python/conda/linux-64/mkl-2025.3.1-intel_8.conda",
+            "fd4fbba07cfa579aea6fde28a6468cf98f350ec9e5939a936ef77b78d54e6a4e",
+            filename="mkl",
         ),
-        ArchiveSource(
-            "https://software.repos.intel.com/python/conda/linux-64/onemkl-sycl-datafitting-2025.0.0-intel_939.tar.bz2",
-            "08076e4d6395c68dc6cf125a9362cb2f3da1ec34d207a65bae483f57f3b05547"
+        FileSource(
+            "https://software.repos.intel.com/python/conda/linux-64/mkl-devel-2025.3.1-intel_8.conda",
+            "c49f1491dae70e0d9459f67d22aceb7fc6b99ef6e6e398d01032eca9a3d1af81",
+            filename="mkl-devel",
         ),
-        ArchiveSource(
-            "https://software.repos.intel.com/python/conda/linux-64/onemkl-sycl-dft-2025.0.0-intel_939.tar.bz2",
-            "d982cc495b4a19457c1f0382c312465628e774c627300a0530a3d674241f647b"
+        FileSource(
+            "https://software.repos.intel.com/python/conda/linux-64/mkl-devel-dpcpp-2025.3.1-intel_8.conda",
+            "e883304560e97f4b62e1a13d2e25e0a89b1cd49fa184940ecc86a2e7d55be144",
+            filename="mkl-devel-dpcpp",
         ),
-        ArchiveSource(
-            "https://software.repos.intel.com/python/conda/linux-64/onemkl-sycl-lapack-2025.0.0-intel_939.tar.bz2",
-            "875292b7539b528c027d8c4e78ebe809c3914359decc2fc1c66e7ed03c16feb1"
+        FileSource(
+            "https://software.repos.intel.com/python/conda/linux-64/mkl-dpcpp-2025.3.1-intel_8.conda",
+            "71ad40ea231c45897fa664c943037f734d6dd20b58357d43d5dabe4f71681628",
+            filename="mkl-dpcpp",
         ),
-        ArchiveSource(
-            "https://software.repos.intel.com/python/conda/linux-64/onemkl-sycl-rng-2025.0.0-intel_939.tar.bz2",
-            "21911e846fa86f447eb25e251c02a813dc582c17b25ed0a74a934a2f89a5e80d"
-        ),
-        ArchiveSource(
-            "https://software.repos.intel.com/python/conda/linux-64/onemkl-sycl-sparse-2025.0.0-intel_939.tar.bz2",
-            "041968f53a5ae7c74193afb55dd57ffc20ad038cb4aeb33bdd39fe789e077ea8"
-        ),
-        ArchiveSource(
-            "https://software.repos.intel.com/python/conda/linux-64/onemkl-sycl-stats-2025.0.0-intel_939.tar.bz2",
-            "a7f2d5fb02a6999a5f189cd4a493471c6ab3e716d94ef4b9247653db723329d7"
-        ),
-        ArchiveSource(
-            "https://software.repos.intel.com/python/conda/linux-64/onemkl-sycl-vm-2025.0.0-intel_939.tar.bz2",
-            "ee515cc5ad823d6980e519a9dc8c53dbac42e82ec178b33eeddca4eac2b36060"
+        FileSource(
+            "https://software.repos.intel.com/python/conda/linux-64/mkl-include-2025.3.1-intel_8.conda",
+            "a1775c87558504365dbdbd2e51d91644caa9fcbafca82022cf84889630399593",
+            filename="mkl-include",
         ),
 
-        ArchiveSource(
-            "https://software.repos.intel.com/python/conda/linux-64/tbb-2022.0.0-intel_402.tar.bz2",
-            "3b5abd11a7d2ae0162b8f40bea311e4566e3a6b02a9d4f0928134ae27d76aabd"
+        FileSource(
+            "https://software.repos.intel.com/python/conda/linux-64/onemkl-sycl-blas-2025.3.1-intel_8.conda",
+            "c70a24fd3a5c198b2465aa27933c61ccec215f5e26a87843a74b7fc744f0bbd3",
+            filename="onemkl-sycl-blas",
         ),
-        ArchiveSource(
-            "https://software.repos.intel.com/python/conda/linux-64/tbb-devel-2022.0.0-intel_402.tar.bz2",
-            "1b1029a9ceb00ef7116c3ec0c15a1de10a78eb27a2d3591b53a43a5ffd00ea9e"
+        FileSource(
+            "https://software.repos.intel.com/python/conda/linux-64/onemkl-sycl-datafitting-2025.3.1-intel_8.conda",
+            "bae85a3b444cc1871bf4af5b8104003c9342791e856533e2623e45acb640868a",
+            filename="onemkl-sycl-datafitting",
+        ),
+        FileSource(
+            "https://software.repos.intel.com/python/conda/linux-64/onemkl-sycl-dft-2025.3.1-intel_8.conda",
+            "6009dbe3c40542376f3ef1efe4cb1ce719eac059def5fc299f19ff8d25678dbf",
+            filename="onemkl-sycl-dft",
+        ),
+        FileSource(
+            "https://software.repos.intel.com/python/conda/linux-64/onemkl-sycl-lapack-2025.3.1-intel_8.conda",
+            "b1d6ebab6a0a3c7e030b4080e035cb4249d8f443337e4075f1ed31ed8dfda5c5",
+            filename="onemkl-sycl-lapack",
+        ),
+        FileSource(
+            "https://software.repos.intel.com/python/conda/linux-64/onemkl-sycl-rng-2025.3.1-intel_8.conda",
+            "30a478c33c02a434acaafb987bfefb5c0c17d3a9a322f5d12bfa4641e0feda84",
+            filename="onemkl-sycl-rng",
+        ),
+        FileSource(
+            "https://software.repos.intel.com/python/conda/linux-64/onemkl-sycl-sparse-2025.3.1-intel_8.conda",
+            "178b93773f362bd9753acb0a3185231a70f7339de26c26a765572a30396de7b3",
+            filename="onemkl-sycl-sparse",
+        ),
+        FileSource(
+            "https://software.repos.intel.com/python/conda/linux-64/onemkl-sycl-stats-2025.3.1-intel_8.conda",
+            "c05ed45449fc290ad0083220417860013d35ec9329e0afa08487e3b13ec45bde",
+            filename="onemkl-sycl-stats",
+        ),
+        FileSource(
+            "https://software.repos.intel.com/python/conda/linux-64/onemkl-sycl-vm-2025.3.1-intel_8.conda",
+            "78139bad5752606d22ab67848c8faacf89e106cd4f63f2dca00c92d0ff192783",
+            filename="onemkl-sycl-vm",
         ),
 
-        ArchiveSource(
-            "https://software.repos.intel.com/python/conda/linux-64/tcm-1.2.0-intel_589.tar.bz2",
-            "5806a0b472192a350dc3f9865b980d8f1cc403c94445c77aa8fe4139aa121d99"
+        FileSource(
+            "https://software.repos.intel.com/python/conda/linux-64/tbb-2022.3.1-intel_400.conda",
+            "cc487cad19b3f97ff2dce59816238ddcf83b937e88fdfe4c016233499e5f9718",
+            filename="tbb",
+        ),
+        FileSource(
+            "https://software.repos.intel.com/python/conda/linux-64/tbb-devel-2022.3.1-intel_400.conda",
+            "9917f8f17c5531edfbb93c8b6bb7fbe3c9cef02fafbe73578c157e94b38d6f26",
+            filename="tbb-devel",
         ),
 
-        ArchiveSource(
-            "https://software.repos.intel.com/python/conda/linux-64/umf-0.9.0-intel_590.tar.bz2",
-            "16a384288a8d2b66320aae06201eeecae2a424a7c6c3e5066ff97fe441cef7f9"
+        FileSource(
+            "https://software.repos.intel.com/python/conda/linux-64/tcm-1.5.0-intel_489.conda",
+            "594d122995085e639ac1383b6e39786f3617bbf8ac447cbcd2914ed1f2214c74",
+            filename="tcm",
+        ),
+
+        FileSource(
+            "https://software.repos.intel.com/python/conda/linux-64/umf-1.0.3-intel_17.conda",
+            "a8e2f29edd95dce924269ab4234900cf688a59d1d8c3057bf31ba83bcc719ca7",
+            filename="umf",
         ),
     ]
+    for platform in platforms
 )
 
 script = raw"""
-install_license "info/licenses/license.txt"
+for package in compiler_shared dpcpp-cpp-rt dpcpp_impl_linux-64 dpcpp_linux-64 intel-cmplr-lib-rt \
+               intel-cmplr-lib-ur intel-cmplr-lic-rt intel-opencl-rt intel-openmp intel-sycl-rt mkl \
+               mkl-devel mkl-devel-dpcpp mkl-dpcpp mkl-include onemkl-sycl-blas onemkl-sycl-datafitting \
+               onemkl-sycl-dft onemkl-sycl-lapack onemkl-sycl-rng onemkl-sycl-sparse onemkl-sycl-stats \
+               onemkl-sycl-vm tbb tbb-devel tcm umf; do
+    unzip -o ${package} -d "${WORKSPACE}/srcdir"
+done
+
+# Install zstd
+apk add zstd
+
+find "${WORKSPACE}/srcdir" -name '*.tar.zst' | while read -r archive; do
+    echo "Extracting $archive..."
+    tar --use-compress-program=unzstd -xf "$archive" -C "${WORKSPACE}/srcdir"
+done
 
 # install dependencies in the prefix
 # NOTE: these dependencies _should_ be packaged as JLLs we can depend on,
@@ -140,10 +182,12 @@ install_license "info/licenses/license.txt"
 mkdir -p ${libdir} ${includedir}
 cp -r include/* ${includedir}
 for lib in sycl svml irng imf intlc ur_loader ur_adapter \
-           mkl_core mkl_intel_ilp64 mkl_sequential mkl_sycl \
+           mkl_cdft_core mkl_core mkl_intel_ilp64 mkl_sequential mkl_sycl \
            mkl_avx mkl_def umf tcm; do
-    cp -a lib/lib${lib}*.so* ${libdir}
+    install -Dvm 755 lib/lib${lib}*.so* -t ${libdir}
 done
+
+install_license "info/licenses/license.txt"
 
 cd oneAPI.jl/deps
 
@@ -176,13 +220,14 @@ products = [
 # Dependencies that must be installed before this package can be built
 dependencies = [
     BuildDependency("oneAPI_Level_Zero_Headers_jll"),
+    BuildDependency("oneAPI_Support_Headers_jll"),
     Dependency("oneAPI_Level_Zero_Loader_jll"),
     Dependency("OpenCL_jll"),
     Dependency("Hwloc_jll"),
 ]
 
 non_reg_ARGS = filter(arg -> arg != "--register", ARGS)
-include("../../fancy_toys.jl")
+
 filter!(platform_sources) do (platform, sources)
     should_build_platform(triplet(platform))
 end

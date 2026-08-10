@@ -3,12 +3,12 @@
 using BinaryBuilder
 
 name = "libwebp"
-version = v"1.5.0"
+version = v"1.6.0"
 
 # Collection of sources required to build libwebp
 sources = [
     GitSource("https://chromium.googlesource.com/webm/libwebp",
-              "f7710292e894c8413edaca4610d11dde843c04fd"),
+              "4fa21912338357f89e4fd51cf2368325b59e9bd9"),
 ]
 
 # Bash recipe for building across all platforms
@@ -46,7 +46,7 @@ products = [
 
 # Dependencies that must be installed before this package can be built
 dependencies = [
-    Dependency("Giflib_jll"),
+    Dependency("Giflib_jll"; compat="5.2.3"),
     Dependency("JpegTurbo_jll"),
     Dependency("libpng_jll"),
     Dependency("Libtiff_jll"; compat="4.7.1"),

@@ -3,12 +3,12 @@
 using BinaryBuilder, Pkg
 
 name = "SQLite"
-version = v"3.47.2"
+version = v"3.53.2"
 
 # Collection of sources required to complete build
 sources = [
-    ArchiveSource("https://sqlite.org/2024/sqlite-autoconf-3470200.tar.gz",
-                  "f1b2ee412c28d7472bc95ba996368d6f0cdcf00362affdadb27ed286c179540b"),
+    ArchiveSource("https://sqlite.org/2026/sqlite-autoconf-3530200.tar.gz",
+                  "588ad51949419a56ebe81fe56193d510c559eb94c9a57748387860b5d3069316"),
     FileSource("https://raw.githubusercontent.com/archlinux/svntogit-community/cf0a3337bd854104252dc1ff711e95cc8bc7ffb3/trunk/license.txt",
                "4e57d9ac979f1c9872e69799c2597eeef4c6ce7224f3ede0bf9dc8d217b1e65d";
                filename="LICENSE"),
@@ -58,9 +58,8 @@ products = [
 # Dependencies that must be installed before this package can be built
 dependencies = [
     Dependency("Zlib_jll"),
+    Dependency("dlfcn_win32_jll"; platforms=filter(Sys.iswindows, platforms)),
 ]
 
 # Build the tarballs, and possibly a `build.jl` as well.
 build_tarballs(ARGS, name, version, sources, script, platforms, products, dependencies; julia_compat="1.6")
-
-# Build trigger: 1

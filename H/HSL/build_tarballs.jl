@@ -3,11 +3,11 @@
 using BinaryBuilder, Pkg
 
 name = "HSL"
-version = v"4.0.2"
+version = v"4.0.7"
 
 # Collection of sources required to complete build
 sources = [
-    GitSource("https://github.com/ralna/libHSL.git", "70984034449cf5278006d848d3f6fc13485e9c09")
+    GitSource("https://github.com/ralna/libHSL.git", "616bf515475a7faf00edf06ce7750712cf873dd9")
 ]
 
 # Bash recipe for building across all platforms
@@ -16,7 +16,7 @@ script = raw"""
 cp ${host_prefix}/bin/ninja /usr/bin/ninja
 
 QUADRUPLE="true"
-if [[ "${target}" == *arm* ]] || [[ "${target}" == *aarch64-linux* ]] || [[ "${target}" == *aarch64-unknown-freebsd* ]] || [[ "${target}" == *powerpc64le-linux-gnu* ]]; then
+if [[ "${target}" == *arm* ]] || [[ "${target}" == *aarch64-linux* ]] || [[ "${target}" == *riscv64* ]] || [[ "${target}" == *aarch64-unknown-freebsd* ]] || [[ "${target}" == *powerpc64le-linux-gnu* ]]; then
     QUADRUPLE="false"
 fi
 
