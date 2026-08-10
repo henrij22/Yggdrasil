@@ -52,7 +52,7 @@ products = [
 # Dependencies that must be installed before this package can be built
 dependencies = [
     BuildDependency(PackageSpec(; name="libjulia_jll")),
-    Dependency("libcxxwrap_julia_jll"; compat="0.14"),
+    Dependency("libcxxwrap_julia_jll"; compat="~0.14.10"),
     Dependency("gismo_jll"; compat="~25.7.0"),
 ]
 
