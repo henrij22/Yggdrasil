@@ -25,7 +25,7 @@ cd $WORKSPACE/srcdir/libjlmuesli
 
 # atomic_patch -p1 ${WORKSPACE}/srcdir/patches/patch.patch
 
-cmake -B builddir -DCMAKE_INSTALL_PREFIX=$prefix -DJulia_PREFIX=${prefix} -DCMAKE_TOOLCHAIN_FILE=${CMAKE_TARGET_TOOLCHAIN} -DCMAKE_BUILD_TYPE=Release
+cmake -B builddir -DCMAKE_INSTALL_PREFIX=$prefix -DJulia_PREFIX=${prefix} -DCMAKE_TOOLCHAIN_FILE=${CMAKE_TARGET_TOOLCHAIN} -DCMAKE_BUILD_TYPE=Release -DJLMUESLI_BUILD_TESTS=OFF
 cmake --build builddir --parallel ${nprocs}
 cmake --install builddir
 
