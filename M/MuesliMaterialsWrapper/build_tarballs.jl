@@ -8,12 +8,12 @@ uuid = Base.UUID("a83860b7-747b-57cf-bf1f-3e79990d037f")
 delete!(Pkg.Types.get_last_stdlibs(v"1.6.3"), uuid)
 
 name = "MuesliMaterialsWrapper"
-version = v"0.2.0"
+version = v"0.2.1"
 
 
 # Collection of sources required to complete build
 sources = [
-    GitSource("https://github.com/henrij22/libjlmuesli.git", "4e2bb8bf3b9055680d38a63ce9a6c6ba6a14e099")
+    GitSource("https://github.com/henrij22/libjlmuesli.git", "5049e253b7b3a133aeb0f54a690577ff2ce1b52f")
 ]
 
 # needed for libjulia_platforms and julia_versions
@@ -28,11 +28,6 @@ cd $WORKSPACE/srcdir/libjlmuesli
 cmake -B builddir -DCMAKE_INSTALL_PREFIX=$prefix -DJulia_PREFIX=${prefix} -DCMAKE_TOOLCHAIN_FILE=${CMAKE_TARGET_TOOLCHAIN} -DCMAKE_BUILD_TYPE=Release -DJLMUESLI_BUILD_TESTS=OFF
 cmake --build builddir --parallel ${nprocs}
 cmake --install builddir
-
-# if [[ "${target}" == *-mingw* ]]; then
-# #cmake install only grabs the .dll.a and leaves the actual .dll behind, manually move it 
-# mv builddir/libjlmuesli.dll ${libdir}
-# fi
 """
 
 julia_versions = [v"1.10", v"1.11", v"1.12", v"1.13"]
@@ -53,7 +48,7 @@ products = [
 dependencies = [
     BuildDependency(PackageSpec(; name="libjulia_jll")),
     Dependency("libcxxwrap_julia_jll"; compat="~0.14.10"),
-    Dependency(PackageSpec(name="MuesliMaterials_jll", uuid="ef259003-9f3a-5fc7-ae68-dce6b88dc7d6"); compat="1.16.3")
+    Dependency("MuesliMaterials_jll"; compat="1.16.3"),
 ]
 
 
