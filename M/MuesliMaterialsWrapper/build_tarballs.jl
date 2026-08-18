@@ -8,12 +8,12 @@ uuid = Base.UUID("a83860b7-747b-57cf-bf1f-3e79990d037f")
 delete!(Pkg.Types.get_last_stdlibs(v"1.6.3"), uuid)
 
 name = "MuesliMaterialsWrapper"
-version = v"0.14.2"
+version = v"0.2.0"
 
 
 # Collection of sources required to complete build
 sources = [
-    GitSource("https://github.com/henrij22/libjlmuesli.git", "dcb15bea2ada5fbcd8aa71244e6c0d239bbeb31b")
+    GitSource("https://github.com/henrij22/libjlmuesli.git", "4e2bb8bf3b9055680d38a63ce9a6c6ba6a14e099")
 ]
 
 # needed for libjulia_platforms and julia_versions
@@ -52,8 +52,8 @@ products = [
 # Dependencies that must be installed before this package can be built
 dependencies = [
     BuildDependency(PackageSpec(; name="libjulia_jll")),
-    Dependency("libcxxwrap_julia_jll"; compat="~0.14.8"),
-    Dependency(PackageSpec(name="MuesliMaterials_jll", uuid="ef259003-9f3a-5fc7-ae68-dce6b88dc7d6"); compat="1.16.2")
+    Dependency("libcxxwrap_julia_jll"; compat="~0.14.10"),
+    Dependency(PackageSpec(name="MuesliMaterials_jll", uuid="ef259003-9f3a-5fc7-ae68-dce6b88dc7d6"); compat="1.16.3")
 ]
 
 
