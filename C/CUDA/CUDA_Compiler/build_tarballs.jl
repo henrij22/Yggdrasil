@@ -7,17 +7,21 @@ include(joinpath(YGGDRASIL_DIR, "fancy_toys.jl"))
 include(joinpath(YGGDRASIL_DIR, "platforms", "cuda.jl"))
 
 name = "CUDA_Compiler"
-version = v"0.5.0"
+version = v"0.6.0"
 
 const toolkit_versions = [CUDA.cuda_full_versions; CUDA.cuda_prerelease_versions]
 const compiler_versions = filter(v -> v >= v"11.4", toolkit_versions)
 
+# preferences are read from our own namespace first, falling back to CUDA_Runtime_jll's:
+# LocalPreferences.toml files predating the runtime/compiler split only pin the runtime,
+# and silently combining such a pinned runtime with an auto-selected (newer) compiler
+# would break at load time through major-versioned sonames (e.g. libnvJitLink).
 augment_platform_block = """
-    const CUDA_jll_uuid = Base.UUID("d1e2174e-dfdc-576e-b43e-73b79eb1aca8")
+    const CUDA_jll_uuids = [Base.UUID("d1e2174e-dfdc-576e-b43e-73b79eb1aca8"),
+                            Base.UUID("76a88914-d11a-5bdc-97e0-2f5a05c973a2")]
     $(read(joinpath(@__DIR__, "..", "CUDA_Runtime", "toolkit_selection.jl"), String))
     const cuda_toolkits = $(compiler_versions)
     const cuda_prerelease_toolkits = $(CUDA.cuda_prerelease_versions)
-    const cuda_default_toolkit = $(repr(Base.thisminor(last(CUDA.cuda_full_versions))))
     $(read(joinpath(@__DIR__, "platform_augmentation.jl"), String))"""
 
 script = raw"""
@@ -54,6 +58,9 @@ if [[ ${target} == *-linux-gnu ]]; then
     mv cuda_nvdisasm/bin/nvdisasm ${bindir}
     if [[ -d cuda_tileiras ]]; then
         mv cuda_tileiras/bin/tileiras ${bindir}
+        if [[ -f cuda_tileiras/bin/tileirdisasm ]]; then
+            mv cuda_tileiras/bin/tileirdisasm ${bindir}
+        fi
     fi
 elif [[ ${target} == x86_64-w64-mingw32 ]]; then
     # normalize the layout of the library components: starting with CUDA 13 there's an
@@ -90,6 +97,9 @@ elif [[ ${target} == x86_64-w64-mingw32 ]]; then
     mv cuda_nvdisasm/bin/nvdisasm.exe ${bindir}
     if [[ -d cuda_tileiras ]]; then
         mv cuda_tileiras/bin/tileiras.exe ${bindir}
+        if [[ -f cuda_tileiras/bin/tileirdisasm.exe ]]; then
+            mv cuda_tileiras/bin/tileirdisasm.exe ${bindir}
+        fi
     fi
 
     # Fix permissions
@@ -98,7 +108,8 @@ fi
 """
 
 dependencies = [
-    Dependency("CUDA_Driver_jll"; compat="13"),
+    # 13.3.1: first version providing the toolkit selection library our hook calls into
+    Dependency("CUDA_Driver_jll", v"13.3.1"; compat="13.3.1 - 13"),
 ]
 
 function get_platforms(version::VersionNumber)
@@ -136,6 +147,12 @@ function get_products(version::VersionNumber)
                                    "nvrtc64_112_0"
     nvrtc_builtins_dll = "nvrtc-builtins64_$(version.major)$(version.minor)"
 
+    # NOTE: the libraries must be dlopen'ed eagerly (the default), even though nothing here
+    # calls into them. Other CUDA libraries pick them up by soname at run time: libcusolver,
+    # libcusparse and libcufft link against or dlopen `libnvJitLink.so.$major`, and cuBLASLt,
+    # cuFFT, cuDNN and cuTENSOR dlopen `libnvrtc.so.$major`, which in turn dlopens
+    # `libnvrtc-builtins.so.$major.$minor`. None of them have a RUNPATH, so those lookups
+    # only succeed because this JLL has already loaded the libraries.
     products = [
         FileProduct(["lib/libcudadevrt.a", "lib/cudadevrt.lib"], :libcudadevrt),
         FileProduct("nvvm/libdevice/libdevice.10.bc", :libdevice),
@@ -151,8 +168,12 @@ function get_products(version::VersionNumber)
         nvjitlink_dll = version >= v"13" ? "nvJitLink_130_0" : "nvJitLink_120_0"
         push!(products, LibraryProduct(["libnvJitLink", nvjitlink_dll], :libnvJitLink))
     end
-    if version >= v"13.2"
+    if version >= v"13.1"
         push!(products, ExecutableProduct("tileiras", :tileiras))
+    end
+    if version >= v"13.4"
+        # NVIDIA started shipping the Tile IR disassembler with CUDA 13.4
+        push!(products, ExecutableProduct("tileirdisasm", :tileirdisasm))
     end
     return products
 end
@@ -173,7 +194,7 @@ for version in compiler_versions
     if version >= v"13"
         push!(components, "libnvvm")
     end
-    if version >= v"13.2"
+    if version >= v"13.1"
         push!(components, "cuda_tileiras")
     end
 
