@@ -8,12 +8,12 @@ uuid = Base.UUID("a83860b7-747b-57cf-bf1f-3e79990d037f")
 delete!(Pkg.Types.get_last_stdlibs(v"1.6.3"), uuid)
 
 name = "MuesliMaterialsWrapper"
-version = v"0.2.1"
+version = v"0.2.2"
 
 
 # Collection of sources required to complete build
 sources = [
-    GitSource("https://github.com/henrij22/libjlmuesli.git", "5049e253b7b3a133aeb0f54a690577ff2ce1b52f")
+    GitSource("https://github.com/henrij22/libjlmuesli.git", "0ac882e83594ee266b3e6eb90ae865256993d210")
 ]
 
 # needed for libjulia_platforms and julia_versions
