@@ -3,18 +3,25 @@
 using BinaryBuilder, Pkg
 
 name = "oneAPI_Support_Headers"
-version = v"2025.0.0"
+version = v"2025.3.1"
 
 # Collection of sources required to complete build
 sources = [
-    ArchiveSource("https://software.repos.intel.com/python/conda/linux-64/mkl-devel-dpcpp-2025.0.0-intel_939.tar.bz2",
-                  "149c3d52dcc7db2d30329e686f721dc3addc017ba19034b7517c9d287f29f7d6")
+    # https://pypi.org/project/onemkl-sycl-include/2025.3.1/
+    FileSource("https://files.pythonhosted.org/packages/79/70/d64211c4cf78490b273d449a7a4bd62e11a2a61c0b6b8dbef6b7c179c244/onemkl_sycl_include-2025.3.1-py2.py3-none-manylinux_2_28_x86_64.whl",
+               "8cf08d257ecf004f71f6c70b49da9793332daef7e556ab062f342071900fe435"; filename="oneapi-headers.whl"),
 ]
 
 # Bash recipe for building across all platforms
 script = raw"""
+cd $WORKSPACE/srcdir
+unzip -d oneapi-headers oneapi-headers.whl
+cd oneapi-headers/onemkl_sycl_include-2025.3.1.data/data
+
 mkdir $includedir
 cp -r include/oneapi $includedir
+
+install_license $WORKSPACE/srcdir/oneapi-headers/onemkl_sycl_include-2025.3.1.dist-info/LICENSE.txt
 """
 
 # These are the platforms we will build for by default, unless further
@@ -30,4 +37,6 @@ products = [
 dependencies = Dependency[]
 
 # Build the tarballs, and possibly a `build.jl` as well.
-build_tarballs(ARGS, name, version, sources, script, platforms, products, dependencies)
+build_tarballs(ARGS, name, version, sources, script, platforms, products, dependencies;
+               julia_compat="1.6")
+

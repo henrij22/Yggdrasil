@@ -2,12 +2,15 @@
 # `julia build_tarballs.jl --help` to see a usage message.
 using BinaryBuilder, Pkg
 
+const YGGDRASIL_DIR = "../.."
+include(joinpath(YGGDRASIL_DIR, "platforms", "macos_sdks.jl"))
+
 name = "aws_c_cal"
-version = v"0.7.4"
+version = v"0.9.14"
 
 # Collection of sources required to complete build
 sources = [
-    GitSource("https://github.com/awslabs/aws-c-cal.git", "2cb1d2eac925e2dbc45025eb89af82bd790c23a0"),
+    GitSource("https://github.com/awslabs/aws-c-cal.git", "9edd8eac2b21ca6a04535b91d60d361c2f1bb60f"),
 ]
 
 # Bash recipe for building across all platforms
@@ -26,6 +29,8 @@ cmake -DCMAKE_INSTALL_PREFIX=${prefix} \
 cmake --build . -j${nproc} --target install
 """
 
+sources, script = require_macos_sdk("10.15", sources, script)
+
 # These are the platforms we will build for by default, unless further
 # platforms are passed in on the command line
 platforms = supported_platforms()
@@ -38,7 +43,7 @@ products = [
 
 # Dependencies that must be installed before this package can be built
 dependencies = [
-    Dependency("aws_c_common_jll"; compat="0.9.3"),
+    Dependency("aws_c_common_jll"; compat="0.13.0"),
     BuildDependency("aws_lc_jll"),
 ]
 
