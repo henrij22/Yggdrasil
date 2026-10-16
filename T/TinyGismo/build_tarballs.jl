@@ -8,7 +8,7 @@ uuid = Base.UUID("a83860b7-747b-57cf-bf1f-3e79990d037f")
 delete!(Pkg.Types.get_last_stdlibs(v"1.6.3"), uuid)
 
 name = "TinyGismo"
-version = v"0.3.0"
+version = v"0.4.0"
 
 
 # Collection of sources required to complete build
@@ -52,8 +52,8 @@ products = [
 # Dependencies that must be installed before this package can be built
 dependencies = [
     BuildDependency(PackageSpec(; name="libjulia_jll")),
-    Dependency("libcxxwrap_julia_jll"; compat="~0.14.10"),
-    Dependency("gismo_jll"; compat="~25.7.0"),
+    Dependency("libcxxwrap_julia_jll"; compat="~0.14.11"),
+    Dependency("gismo_jll"; compat="~26.9.0"),
 ]
 
 
