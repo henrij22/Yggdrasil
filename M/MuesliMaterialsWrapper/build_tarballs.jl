@@ -8,7 +8,7 @@ uuid = Base.UUID("a83860b7-747b-57cf-bf1f-3e79990d037f")
 delete!(Pkg.Types.get_last_stdlibs(v"1.6.3"), uuid)
 
 name = "MuesliMaterialsWrapper"
-version = v"0.2.2"
+version = v"0.3.0"
 
 
 # Collection of sources required to complete build
@@ -47,8 +47,8 @@ products = [
 # Dependencies that must be installed before this package can be built
 dependencies = [
     BuildDependency(PackageSpec(; name="libjulia_jll")),
-    Dependency("libcxxwrap_julia_jll"; compat="~0.14.10"),
-    Dependency("MuesliMaterials_jll"; compat="1.16.3"),
+    Dependency("libcxxwrap_julia_jll"; compat="~0.14.11"),
+    Dependency("MuesliMaterials_jll"; compat="~2.0.0"),
 ]
 
 
