@@ -1,4 +1,5 @@
 import Downloads, Pkg, YAML
+using SHA: sha256
 using Dates
 
 function check_pkgserver_latency(; tolerance = Hour(1))
@@ -84,7 +85,7 @@ agent() = Dict(
 plugins() = Pair{String, Union{Nothing, Dict}}[
     "JuliaCI/julia#v1" => Dict(
         "persist_depot_dirs" => "packages,artifacts,compiled",
-        "version" => "1.12.7",
+        "version" => "1.13.2",
         "artifacts_size_limit" => string(120 << 30), # 120 GiB
     ),
     "JuliaCI/merge-commit" => nothing
@@ -123,7 +124,13 @@ struct BB1BuildStep <: AbstractBuildStep
     platform::String
 end
 
-bb1_step_key(project_name::String, platform::String) = "$(safe_name(project_name))--$(safe_name(platform))"
+function bb1_step_key(project_name::String, platform::String)
+    key = "$(safe_name(project_name))--$(safe_name(platform))"
+    # Buildkite rejects keys longer than 100 characters, which platforms with several
+    # tags (e.g. cross toolchains) can exceed; keep such keys unique with a hash.
+    length(key) <= 100 && return key
+    return "$(first(key, 90))-$(bytes2hex(sha256(key))[1:9])"
+end
 step_key(bs::BB1BuildStep) = bb1_step_key(bs.project, bs.platform)
 
 struct BB2BuildStep <: AbstractBuildStep
