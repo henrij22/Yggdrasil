@@ -16,7 +16,9 @@ sources = [
     GitSource("https://github.com/henrij22/libjlmuesli.git", "0ac882e83594ee266b3e6eb90ae865256993d210")
 ]
 
-# needed for libjulia_platforms and julia_versions
+julia_versions = [v"1.11", v"1.12", v"1.13", v"1.14"]
+
+# needed for libjulia_platforms
 include("../../L/libjulia/common.jl")
 
 # Bash recipe for building across all platforms
