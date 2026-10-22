@@ -41,7 +41,7 @@ products = [
 # Dependencies that must be installed before this package can be built
 dependencies = [
     BuildDependency(PackageSpec(; name="libjulia_jll")),
-    Dependency("libcxxwrap_julia_jll"; compat="~0.14.11"),
+    Dependency("libcxxwrap_julia_jll"; compat="~0.14.12"),
     Dependency("MuesliMaterials_jll"; compat="~2.0.0"),
 ]
 
