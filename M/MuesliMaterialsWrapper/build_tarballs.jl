@@ -30,13 +30,7 @@ cmake --build builddir --parallel ${nprocs}
 cmake --install builddir
 """
 
-julia_versions = [v"1.10", v"1.11", v"1.12", v"1.13"]
-julia_compat = join("~" .* string.(getfield.(julia_versions, :major)) .* "." .* string.(getfield.(julia_versions, :minor)), ", ")
-
 platforms = vcat(libjulia_platforms.(julia_versions)...)
-
-# This can be removed when libcxxwrap_julia_jll supports riscv (does it?)
-filter!(p -> !(arch(p) == "riscv64"), platforms)
 platforms = expand_cxxstring_abis(platforms)
 
 # The products that we will ensure are always built
@@ -53,4 +47,4 @@ dependencies = [
 
 
 # Build the tarballs, and possibly a `build.jl` as well.
-build_tarballs(ARGS, name, version, sources, script, platforms, products, dependencies; julia_compat=julia_compat, preferred_gcc_version=v"10")
+build_tarballs(ARGS, name, version, sources, script, platforms, products, dependencies; julia_compat=libjulia_julia_compat(julia_versions), preferred_gcc_version=v"10")
