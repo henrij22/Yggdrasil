@@ -8,7 +8,7 @@ uuid = Base.UUID("a83860b7-747b-57cf-bf1f-3e79990d037f")
 delete!(Pkg.Types.get_last_stdlibs(v"1.6.3"), uuid)
 
 name = "TinyGismo"
-version = v"0.4.0"
+version = v"0.4.1"
 
 
 # Collection of sources required to complete build
@@ -16,7 +16,9 @@ sources = [
     GitSource("https://github.com/henrij22/libjltinygismo", "c399976f8f5ad8cd1cb0682b78179c46a701b7b7")
 ]
 
-# needed for libjulia_platforms and julia_versions
+julia_versions = [v"1.11", v"1.12", v"1.13", v"1.14"]
+
+# needed for libjulia_platforms
 include("../../L/libjulia/common.jl")
 
 # Bash recipe for building across all platforms
@@ -35,13 +37,7 @@ cmake --install builddir
 
 """
 
-julia_versions = [v"1.11", v"1.12", v"1.13"]
-julia_compat = join("~" .* string.(getfield.(julia_versions, :major)) .* "." .* string.(getfield.(julia_versions, :minor)), ", ")
-
 platforms = vcat(libjulia_platforms.(julia_versions)...)
-
-# This can be removed when libcxxwrap_julia_jll supports riscv (does it?)
-filter!(p -> !(arch(p) == "riscv64"), platforms)
 platforms = expand_cxxstring_abis(platforms)
 
 # The products that we will ensure are always built
@@ -52,10 +48,10 @@ products = [
 # Dependencies that must be installed before this package can be built
 dependencies = [
     BuildDependency(PackageSpec(; name="libjulia_jll")),
-    Dependency("libcxxwrap_julia_jll"; compat="~0.14.11"),
+    Dependency("libcxxwrap_julia_jll"; compat="~0.14.12"),
     Dependency("gismo_jll"; compat="~26.9.0"),
 ]
 
 
 # Build the tarballs, and possibly a `build.jl` as well.
-build_tarballs(ARGS, name, version, sources, script, platforms, products, dependencies; julia_compat=julia_compat, preferred_gcc_version=v"10")
+build_tarballs(ARGS, name, version, sources, script, platforms, products, dependencies; julia_compat=libjulia_julia_compat(julia_versions), preferred_gcc_version=v"10")
