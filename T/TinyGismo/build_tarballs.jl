@@ -8,12 +8,12 @@ uuid = Base.UUID("a83860b7-747b-57cf-bf1f-3e79990d037f")
 delete!(Pkg.Types.get_last_stdlibs(v"1.6.3"), uuid)
 
 name = "TinyGismo"
-version = v"0.4.1"
+version = v"0.4.2"
 
 
 # Collection of sources required to complete build
 sources = [
-    GitSource("https://github.com/henrij22/libjltinygismo", "c399976f8f5ad8cd1cb0682b78179c46a701b7b7")
+    GitSource("https://github.com/henrij22/libjltinygismo", "f2fd14470c5291db0d3e45e1393ed5821881f209")
 ]
 
 julia_versions = [v"1.11", v"1.12", v"1.13", v"1.14"]
