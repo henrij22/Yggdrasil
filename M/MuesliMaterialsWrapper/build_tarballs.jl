@@ -13,7 +13,7 @@ version = v"1.0.1"
 
 # Collection of sources required to complete build
 sources = [
-    GitSource("https://github.com/henrij22/libjlmuesli.git", "0ac882e83594ee266b3e6eb90ae865256993d210")
+    GitSource("https://github.com/henrij22/libjlmuesli.git", "ac2eb0c054b459e57ab5596df79844f87870ee25")
 ]
 
 julia_versions = [v"1.11", v"1.12", v"1.13", v"1.14"]
