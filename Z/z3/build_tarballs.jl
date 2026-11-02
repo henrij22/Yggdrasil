@@ -6,12 +6,12 @@ const YGGDRASIL_DIR = "../.."
 include(joinpath(YGGDRASIL_DIR, "platforms", "macos_sdks.jl"))
 
 name = "z3"
-version = v"5.3.1"
+version = v"5.3.3"
 
 # Collection of sources required to complete build
 sources = [
     ArchiveSource("https://github.com/Z3Prover/z3/releases/download/z3-$(version)/z3_solver-$(version).0.tar.gz",
-                  "efa420092193e1e65f90fedb0905e230deb1673634e0c66cccf4aab14d533473"),
+                  "d95af3980d65ccfd60d23124c6769b1f1564c437049502ce70c476e43abb3d42"),
     DirectorySource("bundled"),
 ]
 
@@ -73,7 +73,7 @@ dependencies = [
     HostBuildDependency("CMake_jll"),
     BuildDependency("libjulia_jll"),
     Dependency("GMP_jll"),
-    Dependency("libcxxwrap_julia_jll"; compat="0.14.9"),
+    Dependency("libcxxwrap_julia_jll"; compat="0.14.12"),
     Dependency("CompilerSupportLibraries_jll"; platforms=filter(!Sys.isapple, platforms)),
 ]
 
